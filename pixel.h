@@ -3,9 +3,11 @@
 
 struct Pixel {
     unsigned int r, g, b;
+    void setRGB(unsigned int r, unsigned int g, unsigned int b);
 };
 
-// Setter
 // s to i = chaine de caractères vers entiers
 
-void setRGB( unsigned int new_r, unsigned int new_g, unsigned int new_b);
+//void Pixel::setRGB( unsigned int r, unsigned int g, unsigned int b);
+
+#endif

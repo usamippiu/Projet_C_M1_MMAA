@@ -4,9 +4,9 @@
 #include <iostream>
 #include <fstream>
 
-void setRGB(unsigned int new_r, unsigned int new_g, unsigned int new_b)
+void Pixel::setRGB(unsigned int r, unsigned int g, unsigned int b)
 {
-    r = new_r;
-    g = new_g;
-    b = new_b;
+    this->r = r;
+    this->g = g;
+    this->b = b;
 }

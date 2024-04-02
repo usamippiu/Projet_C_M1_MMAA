@@ -1,7 +1,8 @@
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 #include "pixel.h"
-
+#include <vector>
+#include <string>
 // image ppm = valeurs ligne par ligne
 class PPMImage {
 private:
@@ -9,7 +10,7 @@ private:
     std::vector<Pixel> pixels;
 
 public:
-    PPMImageLoader(const std::string& filename);
+    void PPMImageLoader(const std::string& filename);
     int getWidth() const;
     int getHeight() const;
     Pixel getPixel(int x, int y) const;
