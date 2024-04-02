@@ -7,7 +7,12 @@
 
 // Charger une image
 void PPMImage::PPMImageLoader(const std::string& filename) {
-    std::ifstream file(filename, std::ios::binary);
+
+    std::ifstream file(filename);
+    std::string line;
+    std::vector<int> dimensions;
+    std::string output;
+
     if (!file.is_open()) {
         std::cerr << "Erreur: Ouverture du fichier " << filename << std::endl;
         return;
@@ -15,17 +20,31 @@ void PPMImage::PPMImageLoader(const std::string& filename) {
 
     std::string magic;
     file >> magic;
-    if (magic != "P6") {
-        std::cerr << "Erreur: Format du fichier " << std::endl;
+    if (magic != "P3") {
+        std::cerr << "Erreur: Format du fichier" << std::endl;
+        file.close();
         return;
     }
 
-    file >> this->width >> this->height >> maxColor;
-    file.ignore(256, '\n');
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    int i = 0;
+    for(std::string ligne ; std::getline(file,ligne) ; ){
+        std::stringstream fluxLigne(ligne);
 
-    this->pixels.resize(this->width * this->height);
-    file.read(reinterpret_cast<char*>(this->pixels.data()), this->pixels.size() * sizeof(Pixel));
+        for(std::string mot ; std::getline(fluxLigne,mot, ' '); ){
+            dimensions.push_back(std::stoi(mot));
+        }
 
+        if (i >= 3){
+            Pixel pixelCourant;
+            this->pixelCourant-> r = dimensions[0];
+            this->pixelCourant-> g = dimensions[1];
+            this->pixelCourant-> b = dimensions[2];
+            this->pixel.push_back(pixelCourant);
+        }
+        i ++;
+
+    }
     file.close();
 }
 
@@ -40,7 +59,7 @@ int PPMImage::getHeight() const {
 
 // Avoir le pixel à telles coordonnées de l'image
 Pixel PPMImage::getPixel(int x, int y) const {
-    return this->pixels[y * width + x];
+    return this->pixels[y * this->width + x];
 }
 
 // Ecriture dans une image

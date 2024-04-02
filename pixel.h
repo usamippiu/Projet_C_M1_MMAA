@@ -8,6 +8,4 @@ struct Pixel {
 
 // s to i = chaine de caractères vers entiers
 
-//void Pixel::setRGB( unsigned int r, unsigned int g, unsigned int b);
-
 #endif

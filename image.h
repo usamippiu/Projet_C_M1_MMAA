@@ -6,7 +6,7 @@
 // image ppm = valeurs ligne par ligne
 class PPMImage {
 private:
-    int width, height, maxColor;
+    unsigned int width, height, maxColor;
     std::vector<Pixel> pixels;
 
 public:
