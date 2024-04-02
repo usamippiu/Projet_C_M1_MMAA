@@ -8,14 +8,14 @@
 PPMImage::PPMImageLoader(const std::string& filename) {
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
-        std::cerr << "Error: Failed to open file " << filename << std::endl;
+        std::cerr << "Erreur: Ouverture du fichier " << filename << std::endl;
         return;
     }
 
     std::string magic;
     file >> magic;
     if (magic != "P6") {
-        std::cerr << "Error: Not a PPM file" << std::endl;
+        std::cerr << "Erreur: Format du fichier" << std::endl;
         return;
     }
 
