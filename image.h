@@ -16,7 +16,7 @@ public:
     int getWidth() const;
     int getHeight() const;
     int getMaxColor() const;
-    //Pixel getPixel(int x, int y) const;
+    void afficheMatrice(std::vector<std::vector<Pixel>>&  input, int height, int width);
     std::vector<std::vector<Pixel>> convertTo2D(const std::vector<Pixel>& input, int height, int width);
 
 
