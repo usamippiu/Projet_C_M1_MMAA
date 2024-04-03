@@ -4,51 +4,46 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <sstream>
 
 // Charger une image
 void PPMImage::PPMImageLoader(const std::string& filename) {
-
     std::ifstream file(filename);
     std::string line;
-    std::vector<int> dimensions;
-    std::string output;
+    unsigned int lineCount = 0;
+    while (std::getline(file, line)) {
+        if (line[0] == '#')
+            continue;
 
-    if (!file.is_open()) {
-        std::cerr << "Erreur: Ouverture du fichier " << filename << std::endl;
-        return;
-    }
+        std::istringstream iss(line);
 
-    std::string magic;
-    file >> magic;
-    if (magic != "P3") {
-        std::cerr << "Erreur: Format du fichier" << std::endl;
-        file.close();
-        return;
-    }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    int i = 0;
-    for(std::string ligne ; std::getline(file,ligne) ; ){
-        std::stringstream fluxLigne(ligne);
-
-        for(std::string mot ; std::getline(fluxLigne,mot, ' '); ){
-            dimensions.push_back(std::stoi(mot));
+        if (lineCount == 1){
+            iss >> width >> height;
+            pixels.resize(width * height);
+        }
+        if (lineCount == 2){
+            iss >> maxColor;
         }
 
-        if (i >= 3){
-            Pixel pixelCourant;
-            this->pixelCourant-> r = dimensions[0];
-            this->pixelCourant-> g = dimensions[1];
-            this->pixelCourant-> b = dimensions[2];
-            this->pixel.push_back(pixelCourant);
+        if (lineCount > 3){
+            for (unsigned i = 0; i < width * height - 1; ++i) {
+                std::getline(file, line);
+                pixels[i].r = std::stoi(line);
+                std::getline(file, line);
+                pixels[i].g = std::stoi(line);
+                std::getline(file, line);
+                pixels[i].b = std::stoi(line);
+            }
+            break;
         }
-        i ++;
 
+        lineCount++;
     }
+
     file.close();
 }
 
-// avoir la taille de l'image :
+// Avoir la taille de l'image :
 int PPMImage::getWidth() const {
     return this->width;
 }
