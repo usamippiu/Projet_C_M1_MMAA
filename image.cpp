@@ -11,33 +11,38 @@ void PPMImage::PPMImageLoader(const std::string& filename) {
     std::ifstream file(filename);
     std::string line;
     unsigned int lineCount = 0;
+
+    // iteration sur les lignes
     while (std::getline(file, line)) {
         if (line[0] == '#')
             continue;
 
+        std::istringstream iss(line);
 
+        // Dans les ppm la taille de l'image se trouve en ligne 1
         if (lineCount == 1){
-            std::istringstream iss(line);
             iss >> width >> height;
-            pixels.resize(width * height);
+            this->width = width;
+            this->height = height;
+            this->pixels.resize(width * height);
         }
         if (lineCount == 2){
-            std::istringstream iss(line);
             iss >> maxColor;
+            this->maxColor = maxColor;
         }
 
         if (lineCount >= 3){
             for (unsigned i = 0; i < width*height; ++i) {
-                pixels[i].r = std::stoi(line);
-                std::cout <<pixels[i].r << std::endl;
+                this->pixels[i].r = std::stoi(line);
+                std::cout <<this->pixels[i].r << std::endl;
                 std::getline(file, line);
-                pixels[i].g = std::stoi(line);
-                std::cout <<pixels[i].g << std::endl;
+                this->pixels[i].g = std::stoi(line);
+                std::cout <<this->pixels[i].g << std::endl;
                 std::getline(file, line);
-                pixels[i].b = std::stoi(line);
-                std::cout <<pixels[i].b << std::endl;
+                this->pixels[i].b = std::stoi(line);
+                std::cout <<this->pixels[i].b << std::endl;
                 std::getline(file, line);
-                std::cout << i << " " << pixels[i].r << " " <<pixels[i].g << " " <<pixels[i].b << std::endl;
+                std::cout << " " << this->pixels[i].r << " " << this->pixels[i].g << " " <<this->pixels[i].b << std::endl;
             }
             break;
         }
@@ -48,13 +53,17 @@ void PPMImage::PPMImageLoader(const std::string& filename) {
     file.close();
 }
 
-// avoir la taille de l'image :
+// Avoir la taille de l'image :
 int PPMImage::getWidth() const {
     return this->width;
 }
 
 int PPMImage::getHeight() const {
     return this->height;
+}
+
+int PPMImage::getMaxColor() const{
+    return this->maxColor;
 }
 
 // Avoir le pixel à telles coordonnées de l'image
