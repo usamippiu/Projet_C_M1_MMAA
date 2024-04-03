@@ -3,18 +3,22 @@
 #include "pixel.h"
 #include <vector>
 #include <string>
+
 // image ppm = valeurs ligne par ligne
+// indice i =0 = en haut à gauche de l'image etc
 class PPMImage {
 private:
     unsigned int width, height, maxColor;
-    std::vector<Pixel> pixels;
 
 public:
+    std::vector<Pixel> pixels;
     void PPMImageLoader(const std::string& filename);
     int getWidth() const;
     int getHeight() const;
     int getMaxColor() const;
-    Pixel getPixel(int x, int y) const;
+    //Pixel getPixel(int x, int y) const;
+    std::vector<std::vector<Pixel>> convertTo2D(const std::vector<Pixel>& input, int height, int width);
+
 
 };
 

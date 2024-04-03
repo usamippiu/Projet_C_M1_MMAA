@@ -34,15 +34,15 @@ void PPMImage::PPMImageLoader(const std::string& filename) {
         if (lineCount >= 3){
             for (unsigned i = 0; i < width*height; ++i) {
                 this->pixels[i].r = std::stoi(line);
-                std::cout <<this->pixels[i].r << std::endl;
+                //std::cout <<this->pixels[i].r << std::endl;
                 std::getline(file, line);
                 this->pixels[i].g = std::stoi(line);
-                std::cout <<this->pixels[i].g << std::endl;
+                //std::cout <<this->pixels[i].g << std::endl;
                 std::getline(file, line);
                 this->pixels[i].b = std::stoi(line);
-                std::cout <<this->pixels[i].b << std::endl;
+                //std::cout <<this->pixels[i].b << std::endl;
                 std::getline(file, line);
-                std::cout << " " << this->pixels[i].r << " " << this->pixels[i].g << " " <<this->pixels[i].b << std::endl;
+                //std::cout << " " << this->pixels[i].r << " " << this->pixels[i].g << " " <<this->pixels[i].b << std::endl;
             }
             break;
         }
@@ -67,8 +67,21 @@ int PPMImage::getMaxColor() const{
 }
 
 // Avoir le pixel à telles coordonnées de l'image
-Pixel PPMImage::getPixel(int x, int y) const {
-    return this->pixels[y * this->width + x];
+//Pixel PPMImage::getPixel(int x, int y) const {
+//    return this->pixels[y * this->width + x].getPixel();
+//}
+
+// Conversion pixel vecteur ligne en matrice
+std::vector<std::vector<Pixel>> PPMImage::convertTo2D(const std::vector<Pixel>& input, int height, int width) {
+    std::vector<std::vector<Pixel>> output(height, std::vector<Pixel>(width));
+
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            output[i][j] = input[i * width + j];
+        }
+    }
+
+    return output;
 }
 
-// Ecriture dans une image
+// Ecrire sur l'image
