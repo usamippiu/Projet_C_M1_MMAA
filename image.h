@@ -13,7 +13,9 @@ public:
     void PPMImageLoader(const std::string& filename);
     int getWidth() const;
     int getHeight() const;
+    int getMaxColor() const;
     Pixel getPixel(int x, int y) const;
+
 };
 
 #endif
