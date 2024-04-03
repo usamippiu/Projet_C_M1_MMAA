@@ -31,14 +31,18 @@ void PPMImage::PPMImageLoader(const std::string& filename) {
             this->maxColor = maxColor;
         }
 
-        if (lineCount > 3){
-            for (unsigned i = 0; i < width * height - 1; ++i) {
-                std::getline(file, line);
+        if (lineCount >= 3){
+            for (unsigned i = 0; i < width*height; ++i) {
                 this->pixels[i].r = std::stoi(line);
+                std::cout <<this->pixels[i].r << std::endl;
                 std::getline(file, line);
                 this->pixels[i].g = std::stoi(line);
+                std::cout <<this->pixels[i].g << std::endl;
                 std::getline(file, line);
                 this->pixels[i].b = std::stoi(line);
+                std::cout <<this->pixels[i].b << std::endl;
+                std::getline(file, line);
+                std::cout << " " << this->pixels[i].r << " " << this->pixels[i].g << " " <<this->pixels[i].b << std::endl;
             }
             break;
         }
