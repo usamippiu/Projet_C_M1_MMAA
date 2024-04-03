@@ -15,9 +15,13 @@ int main()
     int height = image.getHeight();
     int maxColor = image.getMaxColor();
     //Pixel pixel = image.getPixel(0, 0);
-    cout<< width << endl;
-    cout<< height << endl;
-    cout<<maxColor <<endl;
-    //cout << image.pixels.getPixel() << endl;
+    cout<< "width = " << width << endl;
+    cout<<"height =" << height << endl;
+    cout<<"maxColor =" << maxColor <<endl;
 
+    std::vector<std::vector<Pixel>> matrice_Pixel;
+    matrice_Pixel = image.convertTo2D(image.pixels, height, width);
+    image.afficheMatrice(matrice_Pixel, height, width);
+    image.MatriceToImage(matrice_Pixel, height, width, maxColor, "output.ppm");
+    return 0;
 }
