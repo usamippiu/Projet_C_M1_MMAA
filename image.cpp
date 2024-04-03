@@ -15,24 +15,29 @@ void PPMImage::PPMImageLoader(const std::string& filename) {
         if (line[0] == '#')
             continue;
 
-        std::istringstream iss(line);
 
         if (lineCount == 1){
+            std::istringstream iss(line);
             iss >> width >> height;
             pixels.resize(width * height);
         }
         if (lineCount == 2){
+            std::istringstream iss(line);
             iss >> maxColor;
         }
 
-        if (lineCount > 3){
-            for (unsigned i = 0; i < 900; ++i) {
-                std::getline(file, line);
+        if (lineCount >= 3){
+            for (unsigned i = 0; i < width*height; ++i) {
                 pixels[i].r = std::stoi(line);
+                std::cout <<pixels[i].r << std::endl;
                 std::getline(file, line);
                 pixels[i].g = std::stoi(line);
+                std::cout <<pixels[i].g << std::endl;
                 std::getline(file, line);
                 pixels[i].b = std::stoi(line);
+                std::cout <<pixels[i].b << std::endl;
+                std::getline(file, line);
+                std::cout << i << " " << pixels[i].r << " " <<pixels[i].g << " " <<pixels[i].b << std::endl;
             }
             break;
         }
