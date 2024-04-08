@@ -21,6 +21,9 @@ public:
     void MatriceToImage(std::vector<std::vector<Pixel>>& input, int height, int width, int maxColor, std::string filename);
     std::vector<float> equationDroite( float x1, float y1, float x2, float y2 );
     void tracerDroite( std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input );
+    std::vector<float> coordonneesPolaires(float x, float y);
+    std::vector<float> equationDroitePolaire( float x, float y );
+    void tracerDroitePolaire( std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input );
 
 };
 
