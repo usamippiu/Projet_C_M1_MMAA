@@ -18,8 +18,12 @@ public:
     int getMaxColor() const;
     void afficheMatrice(std::vector<std::vector<Pixel>>&  input, int height, int width);
     std::vector<std::vector<Pixel>> convertTo2D(const std::vector<Pixel>& input, int height, int width);
-
+    void MatriceToImage(std::vector<std::vector<Pixel>>& input, int height, int width, int maxColor, std::string filename);
+    std::vector<float> equationDroite( float x1, float y1, float x2, float y2 );
+    void tracerDroite( std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input );
 
 };
+
+
 
 #endif

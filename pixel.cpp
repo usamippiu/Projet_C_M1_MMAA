@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 
+//Change la couleur des pixels
 void Pixel::setRGB(unsigned int r, unsigned int g, unsigned int b)
 {
     this->r = r;
