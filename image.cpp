@@ -6,6 +6,7 @@
 #include <vector>
 #include <sstream>
 #include<cmath>
+#include<tuple>
 
 // Charger une image
 void PPMImage::PPMImageLoader(const std::string& filename) {
@@ -192,4 +193,19 @@ void PPMImage::tracerDroitePolaire( std::vector<float> eqDroite, std::vector<std
             input[i][y_entier].setRGB( 0, 0, 0 );
         }
     }
+}
+
+std::vector<std::tuple<double, double>> PPMImage::getNotWhite( std::vector<std::vector<Pixel>>& input )
+{
+    std::vector<std::tuple<double, double>> notWhite;
+     for (unsigned int i = 0; i < height; i++)
+     {
+         for (unsigned int j = 0; j < width; j++)
+         {
+            if (input[i][j].getPixel()[0] != 255 || input[i][j].getPixel()[1] != 255  || input[i][j].getPixel()[2] != 255 ){
+                notWhite.push_back( std::make_tuple(i,j) );
+            }
+         }
+     }
+     return notWhite;
 }

@@ -2,6 +2,7 @@
 #include "pixel.h"
 #include <iostream>
 #include <fstream>
+#include<tuple>
 
 using namespace std;
 int main()
@@ -31,11 +32,18 @@ int main()
     //image.MatriceToImage(matrice_Pixel, height, width, maxColor, "output.ppm");
 
     // Test tracer de droite aux coordonnées polaires
-    std::vector<float> eqDroitePolaire;
+    vector<float> eqDroitePolaire;
     eqDroitePolaire = image.equationDroitePolaire( 10, 30 );
     image.tracerDroitePolaire( eqDroitePolaire, matrice_Pixel );
     image.MatriceToImage(matrice_Pixel, height, width, maxColor, "output.ppm");
 
+    // N'avoir les coordonnées que des pixels blancs
+    std::vector<std::tuple<double, double>> notWhite;
+    notWhite = image.getNotWhite(matrice_Pixel);
+    for (const tuple<double,double>& tuple_:notWhite)
+    {
+        cout << get<0>(tuple_) << " " << get<1>(tuple_) << endl;
+    }
 
 
 }
