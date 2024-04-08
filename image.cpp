@@ -127,13 +127,32 @@ std::vector<float> PPMImage::equationDroite( float x1, float y1, float x2, float
 
 void PPMImage::tracerDroite( std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
 {
-    for(unsigned int i = 0; i < height ; ++i)
-    {
-        float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
-        unsigned int y_entier = (unsigned int) std::round(y);
-        if ( y_entier <= height)
+    // si la droite n'est pas verticale
+
+    if ( std::abs(eqDroite[0]) < 1 ){
+        for(unsigned int i = 0; i < height ; ++i)
         {
-            input[i][y_entier].setRGB( 0, 0, 0 );
+            float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
+            unsigned int y_entier = (unsigned int) std::round(y);
+            if ( y_entier <= height)
+            {
+                input[i][y_entier].setRGB( 0, 0, 0 );
+            }
         }
     }
+
+    // sinon
+
+    else {
+        for(unsigned int i = 0; i < width ; ++i)
+        {
+            float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
+            unsigned int y_entier = (unsigned int) std::round(y);
+            if ( y_entier <= width)
+            {
+                input[y_entier][i].setRGB( 0, 0, 0 );
+            }
+        }
+    }
+
 }
