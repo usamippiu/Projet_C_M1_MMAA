@@ -124,7 +124,7 @@ std::vector<float> PPMImage::equationDroite( float x1, float y1, float x2, float
     return {a, b};
 }
 
-void PPMImage::tracerDroite( std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
+void PPMImage::tracerDroite(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
 {
     // si la droite n'est pas verticale
 
@@ -135,7 +135,7 @@ void PPMImage::tracerDroite( std::vector<float> eqDroite, std::vector<std::vecto
             unsigned int y_entier = (unsigned int) std::round(y);
             if ( y_entier <= height)
             {
-                input[i][y_entier].setRGB( 0, 0, 0 );
+                input[i][y_entier].setRGB(0, 0, 0);
             }
         }
     }
@@ -144,12 +144,12 @@ void PPMImage::tracerDroite( std::vector<float> eqDroite, std::vector<std::vecto
 
     else {
         for(unsigned int i = 0; i < width ; ++i)
-        {
-            float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
-            unsigned int y_entier = (unsigned int) std::round(y);
-            if ( y_entier <= width)
+        {  
+            float x = (i - eqDroite[1])/eqDroite[0]; //equation de droite pour le nouveau point
+            unsigned int x_entier = (unsigned int) std::round(x);
+            if (x_entier <= width)
             {
-                input[y_entier][i].setRGB( 0, 0, 0 );
+                input[x_entier][i].setRGB(0, 0, 0);
             }
         }
     }
@@ -195,6 +195,7 @@ void PPMImage::tracerDroitePolaire( std::vector<float> eqDroite, std::vector<std
     }
 }
 
+// Traitement pour droites dans l'espace de Hough
 std::vector<std::tuple<double, double>> PPMImage::getNotWhite( std::vector<std::vector<Pixel>>& input )
 {
     std::vector<std::tuple<double, double>> notWhite;
@@ -234,7 +235,7 @@ void remove_close_tuples(std::vector<std::tuple<double, double>>& vec, double th
 }
 
 std::vector<std::tuple<double, double>> diviserTuple(const std::vector<std::tuple<double, double>>& vecteur, double quotient) {
-    
+
     std::vector<std::tuple<double, double>> resultat;
 
     for (const auto& element : vecteur) {
@@ -248,7 +249,7 @@ std::vector<std::tuple<double, double>> diviserTuple(const std::vector<std::tupl
 }
 
 std::vector<std::tuple<double, double>> multiplierTuple(const std::vector<std::tuple<double, double>>& vecteur, double quotient) {
-    
+
     std::vector<std::tuple<double, double>> resultat;
 
     for (const auto& element : vecteur) {
@@ -272,14 +273,14 @@ std::vector<std::tuple<double, double>> PPMImage::getLignes(std::vector<std::vec
     float x_max = 2;
     float y_min = -2;
     float y_max = 2;
-    
+
     float precision = .001;
 
     int n_cols = std::round(std::abs(x_min-x_max)/precision);
     int n_rows = std::round(std::abs(y_min-y_max)/precision);
 
     std::vector<std::vector<int>> hough(n_rows, std::vector<int>(n_cols, 0));
-    
+
     for (const std::tuple<double, double>& tuple : scaledTuples) {
         double x = std::get<0>(tuple);
         double y = std::get<1>(tuple);
@@ -303,4 +304,8 @@ std::vector<std::tuple<double, double>> PPMImage::getLignes(std::vector<std::vec
     std::vector<std::tuple<double, double>> rescaledDroites = multiplierTuple(droites, 30.);
 
     return rescaledDroites;
+}
+
+void PPMImage::tracerSegment(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input){
+
 }
