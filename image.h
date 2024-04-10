@@ -24,6 +24,7 @@ public:
     std::vector<float> coordonneesPolaires(float x, float y);
     std::vector<float> equationDroitePolaire(float x, float y);
     void tracerDroitePolaire(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input);
+    void tracerSegment(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input);
     std::vector<std::tuple<double, double>> getNotWhite(std::vector<std::vector<Pixel>>& input);
     std::vector<std::tuple<double, double>> getLignes(std::vector<std::vector<Pixel>>& input, int nb_intersections, double threshold);
 
