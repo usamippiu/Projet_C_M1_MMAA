@@ -162,11 +162,13 @@ std::vector<float> PPMImage::equationDroite( float x1, float y1, float x2, float
 // rho = x costh + y sinth
 std::vector<float> PPMImage::equationDroitePolaire( float x, float y, float rho, float theta )
 {
+    // faire attention si theta = 0
+    // bien diviser par k si on a fait k * pho dans la fonction drawSinusoïd
     float cosTheta = std::cos(theta);
     float sinTheta =  std::sin(theta);
     // a et b de l'équation de la droite
     float a = -cosTheta / sinTheta;
-    float b = rho / sinTheta;
+    float b = rho / 3*sinTheta;
 
     return {a, b};
 }
@@ -342,6 +344,7 @@ std::pair<int, int> PPMImage::getMaximum(const std::vector<std::vector<Pixel>>& 
                 maxPixel.setRGB( input[i][j].r, input[i][j].g, input[i][j].b );
                 maxI = i;
                 maxJ = j;
+                std::cout << "max_test = " << maxPixel.r << std::endl;
             }
         }
     }
