@@ -125,37 +125,37 @@ std::vector<float> PPMImage::equationDroite( float x1, float y1, float x2, float
     return {a, b};
 }
 
-void PPMImage::tracerDroite(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
-{
-    // si la droite n'est pas verticale
-
-    if ( std::abs(eqDroite[0]) < 1 ){
-        for(unsigned int i = 0; i < height ; ++i)
-        {
-            float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
-            unsigned int y_entier = (unsigned int) std::round(y);
-            if ( y_entier <= height)
-            {
-                input[i][y_entier].setRGB(0, 0, 0);
-            }
-        }
-    }
-
-    // sinon
-
-    else {
-        for(unsigned int i = 0; i < width ; ++i)
-        {
-            float x = (i - eqDroite[1])/eqDroite[0]; //equation de droite pour le nouveau point
-            unsigned int x_entier = (unsigned int) std::round(x);
-            if (x_entier <= width)
-            {
-                input[x_entier][i].setRGB(0, 0, 0);
-            }
-        }
-    }
-
-}
+//void PPMImage::tracerDroite(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
+//{
+//    // si la droite n'est pas verticale
+//
+//    if ( std::abs(eqDroite[0]) < 1 ){
+//        for(unsigned int i = 0; i < height ; ++i)
+//        {
+//            float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
+//            unsigned int y_entier = (unsigned int) std::round(y);
+//            if ( y_entier <= height)
+//            {
+//                input[i][y_entier].setRGB(0, 0, 0);
+//            }
+//        }
+//    }
+//
+//    // sinon
+//
+//    else {
+//        for(unsigned int i = 0; i < width ; ++i)
+//        {
+//            float x = (i - eqDroite[1])/eqDroite[0]; //equation de droite pour le nouveau point
+//            unsigned int x_entier = (unsigned int) std::round(x);
+//            if (x_entier <= width)
+//            {
+//                input[x_entier][i].setRGB(0, 0, 0);
+//            }
+//        }
+//    }
+//
+//}
 
 // y = - costh/sinth * x + rho/ sinth
 // theta = angle entre la droite et l'axe des abscisses
@@ -172,7 +172,7 @@ std::vector<float> PPMImage::equationDroitePolaire( float x, float y, float rho,
 }
 
 // Droite polaire
-void PPMImage::tracerDroitePolaire( std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
+void PPMImage::tracerDroite( std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
 {
     for (unsigned int i = 0; i < height; i++)
     {
