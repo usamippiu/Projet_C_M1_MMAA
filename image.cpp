@@ -169,10 +169,10 @@ std::vector<float> PPMImage::coordonneesPolaires(float x, float y) {
 // rho = x costh + y sinth
 std::vector<float> PPMImage::equationDroitePolaire( float x, float y )
 {
-    float cosTheta = coordonneesPolaires( x, y)[0];
-    float sinTheta = coordonneesPolaires( x, y)[1];
+    float cosTheta = coordonneesPolaires(x, y)[0];
+    float sinTheta = coordonneesPolaires(x, y)[1];
     // rho pour le point
-    float rho = coordonneesPolaires( x, y)[2];
+    float rho = coordonneesPolaires(x, y)[2];
     // a et b de l'équation de la droite
     float a = -cosTheta / sinTheta;
     float b = rho / sinTheta;
@@ -217,20 +217,35 @@ double tuple_norm(const std::tuple<double, double>& a, const std::tuple<double, 
     return std::sqrt(dx * dx + dy * dy);
 }
 
+std::tuple<double, double> average_tuple(const std::vector<std::tuple<double, double>>& tuples) {
+    double sum_x = 0.0;
+    double sum_y = 0.0;
+    for (const auto& tuple : tuples) {
+        sum_x += std::get<0>(tuple);
+        sum_y += std::get<1>(tuple);
+    }
+    return std::make_tuple(sum_x / tuples.size(), sum_y / tuples.size());
+}
+
 void remove_close_tuples(std::vector<std::tuple<double, double>>& vec, double threshold) {
-    auto it = vec.begin();
-    while (it != vec.end()) {
-        bool removed = false;
-        auto it2 = std::next(it);
-        while (it2 != vec.end()) {
-            if (tuple_norm(*it, *it2) < threshold) {
-                it2 = vec.erase(it2);
-                removed = true;
-            } else {
-                ++it2;
+    std::vector<std::vector<std::tuple<double, double>>> close_tuples_groups;
+    for (const auto& tuple : vec) {
+        bool grouped = false;
+        for (auto& group : close_tuples_groups) {
+            if (tuple_norm(group.front(), tuple) < threshold) {
+                group.push_back(tuple);
+                grouped = true;
+                break;
             }
         }
-        if (!removed) ++it;
+        if (!grouped) {
+            close_tuples_groups.push_back({tuple});
+        }
+    }
+
+    vec.clear();
+    for (const auto& group : close_tuples_groups) {
+        vec.push_back(average_tuple(group));
     }
 }
 
@@ -308,4 +323,16 @@ std::vector<std::tuple<double, double>> PPMImage::getLignes(std::vector<std::vec
 
 void PPMImage::tracerSegment(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input){
 
+    for(unsigned int i = 0; i < height ; ++i)
+    {
+        float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
+        unsigned int y_entier = (unsigned int) std::round(y);
+        if ( y_entier <= height)
+        {
+            if (input[i][y_entier].r != 255 && input[i][y_entier].g != 255 && input[i][y_entier].b != 255){
+                input[i][y_entier].setRGB(0, 0, 0);
+            }
+        }
+
+    }
 }

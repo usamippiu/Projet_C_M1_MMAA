@@ -48,9 +48,8 @@ int main()
     std::vector<std::tuple<double, double>> droites = image.getLignes(matrice_Pixel, 10, .3);
 
     affiche_tuples(droites);
-
     for (unsigned int i = 0; i<droites.size(); ++i)
-        image.tracerDroitePolaire({float(get<0>(droites[i])), float(get<1>(droites[i]))}, matrice_Pixel);
+        image.tracerSegment({float(get<0>(droites[i])), float(get<1>(droites[i]))}, matrice_Pixel);
     image.MatriceToImage(matrice_Pixel, "output.ppm");
 
 }
