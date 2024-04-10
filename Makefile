@@ -1,6 +1,6 @@
 CC=g++
 LD=g++
-CFLAGS=-g -Wall -pedantic -std=c++11 -Werror
+CFLAGS=-g -Wall -pedantic -std=c++11
 LIBS=-lm
 
 all: main

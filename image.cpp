@@ -7,6 +7,7 @@
 #include <sstream>
 #include<cmath>
 #include<tuple>
+#include<utility>
 
 // Charger une image
 void PPMImage::PPMImageLoader(const std::string& filename) {
@@ -68,9 +69,9 @@ int PPMImage::getMaxColor() const{
 
 // Afficher la matrice de Pixel
 void PPMImage::afficheMatrice(std::vector<std::vector<Pixel>>&  input) {
-    for(unsigned int i = 0; i < this->height; i++ )
+    for(unsigned int i = 0; i <input.size(); i++ )
     {
-        for(unsigned int j = 0; j < this->width ; j++)
+        for(unsigned int j = 0; j < input[0].size() ; j++)
         {
             std::cout << "r " << input[i][j].getPixel()[0] << " g " << input[i][j].getPixel()[1] << " b " << input[i][j].getPixel()[2] << std::endl;
         }
@@ -336,3 +337,24 @@ void PPMImage::tracerSegment(std::vector<float> eqDroite, std::vector<std::vecto
 
     }
 }
+
+std::pair<int, int> PPMImage::maximum(const std::vector<std::vector<Pixel>>& input)
+{
+    Pixel maxPixel;
+    maxPixel.setRGB(0, 0, 0) ;
+    int maxI = 0;
+    int maxJ = 0;
+
+    for (int i = 0; i < input.size(); ++i) {
+        for (int j = 0; j < input[i].size(); ++j) {
+
+            if (input[i][j].r > maxPixel.r || input[i][j].g > maxPixel.g || input[i][j].b > maxPixel.b ) {
+                maxPixel.setRGB( input[i][j].r, input[i][j].g, input[i][j].b );
+                maxI = i;
+                maxJ = j;
+            }
+        }
+    }
+    return {maxI, maxJ};
+}
+
