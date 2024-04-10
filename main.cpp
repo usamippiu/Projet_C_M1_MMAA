@@ -68,9 +68,10 @@ int main()
     image.MatriceToImage(output, "sinusoide.ppm");
     image.afficheMatrice(output);
 
-    std::pair<int, int> coordonnees_max = image.maximum(output);
+    std::pair<int, int> coordonnees_max = image.getMaximum(output);
     cout << "coordonnées maximum = (" << coordonnees_max.first << " , " << coordonnees_max.second << ")" << endl;
-
+//    std::vector<float> equationDroitePolaire(float x, float y, float rho, float theta);
+//    void tracerDroitePolaire(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input);
 }
 
 

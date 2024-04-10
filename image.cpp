@@ -157,23 +157,13 @@ void PPMImage::tracerDroite(std::vector<float> eqDroite, std::vector<std::vector
 
 }
 
-// Conversion coordonnées polaires
-std::vector<float> PPMImage::coordonneesPolaires(float x, float y) {
-    float rho = std::sqrt(x * x + y * y);
-    float theta = std::atan2(y, x);
-    return {std::cos(theta), std::sin(theta), rho, theta};
-}
-
 // y = - costh/sinth * x + rho/ sinth
 // theta = angle entre la droite et l'axe des abscisses
-// rho = distance entre la droite et l'origine = matrice_pixel[0][0]
 // rho = x costh + y sinth
-std::vector<float> PPMImage::equationDroitePolaire( float x, float y )
+std::vector<float> PPMImage::equationDroitePolaire( float x, float y, float rho, float theta )
 {
-    float cosTheta = coordonneesPolaires(x, y)[0];
-    float sinTheta = coordonneesPolaires(x, y)[1];
-    // rho pour le point
-    float rho = coordonneesPolaires(x, y)[2];
+    float cosTheta = std::cos(theta);
+    float sinTheta =  std::sin(theta);
     // a et b de l'équation de la droite
     float a = -cosTheta / sinTheta;
     float b = rho / sinTheta;
@@ -338,7 +328,7 @@ void PPMImage::tracerSegment(std::vector<float> eqDroite, std::vector<std::vecto
     }
 }
 
-std::pair<int, int> PPMImage::maximum(const std::vector<std::vector<Pixel>>& input)
+std::pair<int, int> PPMImage::getMaximum(const std::vector<std::vector<Pixel>>& input)
 {
     Pixel maxPixel;
     maxPixel.setRGB(0, 0, 0) ;
