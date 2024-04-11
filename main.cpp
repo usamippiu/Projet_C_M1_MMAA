@@ -17,7 +17,7 @@ int main()
 
     // Test de la classe image et ses méthodes
     PPMImage image;
-    image.PPMImageLoader("m1projetcpp2.ppm");
+    image.PPMImageLoader("image3fix.ppm");
     // setters et getters
     int width = image.getWidth();
     int height = image.getHeight();
@@ -29,7 +29,7 @@ int main()
     // Création de la matrice de pixel
     std::vector<std::vector<Pixel>> matrice_Pixel;
     matrice_Pixel = image.convertTo2D();
-    image.afficheMatrice(matrice_Pixel);
+    // image.afficheMatrice(matrice_Pixel);
     //image.MatriceToImage(matrice_Pixel, height, width, maxColor, "output.ppm");
 
     // Test tracer de droite
@@ -45,11 +45,11 @@ int main()
     // image.MatriceToImage(matrice_Pixel, height, width, maxColor, "output.ppm");
 
     // Approche naive
-    std::vector<std::tuple<double, double>> droites = image.getLignes(matrice_Pixel, 10, .3);
+    std::vector<std::tuple<double, double>> droites = image.getLignes(matrice_Pixel, 80, 0.2);
+    
 
     affiche_tuples(droites);
     for (unsigned int i = 0; i<droites.size(); ++i)
-        image.tracerSegment({float(get<0>(droites[i])), float(get<1>(droites[i]))}, matrice_Pixel);
+        image.tracerDroite({float(get<0>(droites[i])), float(get<1>(droites[i]))}, matrice_Pixel);
     image.MatriceToImage(matrice_Pixel, "output.ppm");
-
 }

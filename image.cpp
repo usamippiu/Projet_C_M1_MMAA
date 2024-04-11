@@ -124,38 +124,6 @@ std::vector<float> PPMImage::equationDroite( float x1, float y1, float x2, float
     return {a, b};
 }
 
-void PPMImage::tracerDroite(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
-{
-    // si la droite n'est pas verticale
-
-    if ( std::abs(eqDroite[0]) < 1 ){
-        for(unsigned int i = 0; i < height ; ++i)
-        {
-            float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
-            unsigned int y_entier = (unsigned int) std::round(y);
-            if ( y_entier <= height)
-            {
-                input[i][y_entier].setRGB(0, 0, 0);
-            }
-        }
-    }
-
-    // sinon
-
-    else {
-        for(unsigned int i = 0; i < width ; ++i)
-        {  
-            float x = (i - eqDroite[1])/eqDroite[0]; //equation de droite pour le nouveau point
-            unsigned int x_entier = (unsigned int) std::round(x);
-            if (x_entier <= width)
-            {
-                input[x_entier][i].setRGB(0, 0, 0);
-            }
-        }
-    }
-
-}
-
 // Conversion coordonnées polaires
 std::vector<float> PPMImage::coordonneesPolaires(float x, float y) {
     float rho = std::sqrt(x * x + y * y);
@@ -181,16 +149,20 @@ std::vector<float> PPMImage::equationDroitePolaire( float x, float y )
 }
 
 // Droite polaire
-void PPMImage::tracerDroitePolaire( std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
+void PPMImage::tracerDroite( std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
 {
     for (unsigned int i = 0; i < height; i++)
     {
-        float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
-        unsigned int y_entier = (unsigned int) std::round(y);
-
-        if ( y_entier < width )
-        {
-            input[i][y_entier].setRGB( 0, 0, 0 );
+        float y = eqDroite[0] * i + eqDroite[1];
+        if(y >=0){
+            for (unsigned y_rounded = std::floor(y); y_rounded <= std::ceil(y); ++y_rounded) {
+                double percent_y = 1 - std::abs(y - y_rounded);
+                if (y_rounded < width)
+                {
+                    int col = std::round(255*(1-percent_y));
+                    input[i][y_rounded].setRGB(col, col, col);
+                }
+            }
         }
     }
 }
@@ -281,7 +253,7 @@ std::vector<std::tuple<double, double>> PPMImage::getLignes(std::vector<std::vec
     std::vector<std::tuple<double, double>> notWhite;
     notWhite = this->getNotWhite(matrice_Pixel);
 
-    std::vector<std::tuple<double, double>> scaledTuples = diviserTuple(notWhite, 30.);
+    std::vector<std::tuple<double, double>> scaledTuples = diviserTuple(notWhite, height);
     std::vector<std::tuple<double, double>> droites;
 
     float x_min = -2;
@@ -302,11 +274,13 @@ std::vector<std::tuple<double, double>> PPMImage::getLignes(std::vector<std::vec
         for(double m = 0; m < n_cols ; ++m){
             double b = y - (m*std::abs(x_min-x_max)/n_cols+x_min)*x;
             double b_round = std::round(b/precision) - y_min/precision;
-            if (b_round < n_rows){
+            if (b_round < n_rows && b_round > 0){
                 hough[b_round][m] +=1;
             }
         }
     }
+
+
     for (int i = 0; i < n_rows ; ++i){
         for(int j = 0; j < n_cols ; ++j){
             if (hough[i][j] >= nb_intersections)
@@ -316,7 +290,7 @@ std::vector<std::tuple<double, double>> PPMImage::getLignes(std::vector<std::vec
 
     remove_close_tuples(droites, threshold);
 
-    std::vector<std::tuple<double, double>> rescaledDroites = multiplierTuple(droites, 30.);
+    std::vector<std::tuple<double, double>> rescaledDroites = multiplierTuple(droites, height);
 
     return rescaledDroites;
 }
