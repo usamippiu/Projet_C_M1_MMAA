@@ -45,11 +45,12 @@ int main()
     // image.MatriceToImage(matrice_Pixel, height, width, maxColor, "output.ppm");
 
     // Approche naive
-    std::vector<std::tuple<double, double>> droites = image.getLignes(matrice_Pixel, 80, 0.2);
+    std::vector<std::tuple<double, double>> droites = image.getLignesNaif(matrice_Pixel, 80, .2);
     
 
     affiche_tuples(droites);
     for (unsigned int i = 0; i<droites.size(); ++i)
         image.tracerDroite({float(get<0>(droites[i])), float(get<1>(droites[i]))}, matrice_Pixel);
     image.MatriceToImage(matrice_Pixel, "output.ppm");
+
 }

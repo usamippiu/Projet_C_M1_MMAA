@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include "image.h"
 #include "pixel.h"
 
@@ -5,8 +7,8 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
-#include<cmath>
-#include<tuple>
+#include <cmath>
+#include <tuple>
 
 // Charger une image
 void PPMImage::PPMImageLoader(const std::string& filename) {
@@ -148,7 +150,6 @@ std::vector<float> PPMImage::equationDroitePolaire( float x, float y )
     return {a, b};
 }
 
-// Droite polaire
 void PPMImage::tracerDroite( std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
 {
     for (unsigned int i = 0; i < height; i++)
@@ -249,7 +250,7 @@ std::vector<std::tuple<double, double>> multiplierTuple(const std::vector<std::t
     return resultat;
 }
 
-std::vector<std::tuple<double, double>> PPMImage::getLignes(std::vector<std::vector<Pixel>>& matrice_Pixel, int nb_intersections, double threshold){
+std::vector<std::tuple<double, double>> PPMImage::getLignesNaif(std::vector<std::vector<Pixel>>& matrice_Pixel, int nb_intersections, double threshold){
     std::vector<std::tuple<double, double>> notWhite;
     notWhite = this->getNotWhite(matrice_Pixel);
 
@@ -295,6 +296,55 @@ std::vector<std::tuple<double, double>> PPMImage::getLignes(std::vector<std::vec
     return rescaledDroites;
 }
 
+std::vector<std::tuple<double, double>> PPMImage::getLignesNonNaif(std::vector<std::vector<Pixel>>& matrice_Pixel, int nb_intersections, double threshold){
+    std::vector<std::tuple<double, double>> notWhite;
+    notWhite = this->getNotWhite(matrice_Pixel);
+
+    std::vector<std::tuple<double, double>> scaledTuples = diviserTuple(notWhite, height);
+    std::vector<std::tuple<double, double>> droites;
+
+    float x_min = 0;
+    float x_max = M_PI;
+    float y_min = -2;
+    float y_max = 2;
+
+
+    float precision = .001;
+
+    int n_cols = std::round(std::abs(x_min-x_max)/precision);
+    int n_rows = std::round(std::abs(y_min-y_max)/precision);
+
+    std::vector<std::vector<int>> hough(n_rows, std::vector<int>(n_cols, 0));
+
+    for (const std::tuple<double, double>& tuple : scaledTuples) {
+        double x = std::get<0>(tuple);
+        double y = std::get<1>(tuple);
+        for(double theta = 0; theta < n_cols ; ++theta){
+            double rho = x*cos(theta*std::abs(x_min-x_max)/n_cols) + y*sin(theta*std::abs(x_min-x_max)/n_cols);
+            double rho_round = std::round(rho/precision - y_min/precision);
+            if (rho_round < n_rows && rho_round > 0){
+                hough[rho_round][theta] +=1;
+            }
+        }
+    }
+
+    for (int i = 0; i < n_rows ; ++i){
+        for(int j = 0; j < n_cols ; ++j){
+            if (hough[i][j] >= nb_intersections){
+                if (sin(j*precision+x_min) > 0.01){
+                    droites.push_back(std::make_tuple(-cos(j*precision+x_min)/sin(j*precision+x_min), (i*precision+y_min)/sin(j*precision+x_min)));
+                }
+            }
+        }
+    }
+
+    remove_close_tuples(droites, threshold);
+
+    std::vector<std::tuple<double, double>> rescaledDroites = multiplierTuple(droites, height);
+
+    return rescaledDroites;
+}
+
 void PPMImage::tracerSegment(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input){
 
     for(unsigned int i = 0; i < height ; ++i)
@@ -307,6 +357,5 @@ void PPMImage::tracerSegment(std::vector<float> eqDroite, std::vector<std::vecto
                 input[i][y_entier].setRGB(0, 0, 0);
             }
         }
-
     }
 }
