@@ -3,7 +3,6 @@
 #include "pixel.h"
 #include <vector>
 #include <string>
-#include <utility>
 
 // image ppm = valeurs ligne par ligne
 // indice i =0 = en haut à gauche de l'image etc
@@ -12,30 +11,24 @@ private:
     unsigned int width, height, maxColor;
 
 public:
-    std::vector<Pixel> pixels; // Attribut matrice de pixel
-    void PPMImageLoader(const std::string& filename); // Charger et initialiser l'image
-    // Getters
+    // Getters et Setters
+    std::vector<Pixel> pixels; // Vecteur de pixels qui represente l'image ppm
+    void PPMImageLoader(const std::string& filename);
     int getWidth() const;
     int getHeight() const;
     int getMaxColor() const;
 
-    // Affichage et conversion matrice - image
+    // Gestion de l'image en objet matrice
+    std::vector<std::vector<Pixel>> convertTo2D(); // Convertit le vecteur de pixel en matrice
+    void MatriceToImage(std::vector<std::vector<Pixel>>& input, std::string filename); // Convertit une matrice de pixel en image
     void afficheMatrice(std::vector<std::vector<Pixel>>& input);
-    std::vector<std::vector<Pixel>> convertTo2D();
-    void MatriceToImage(std::vector<std::vector<Pixel>>& input, std::string filename);
 
-    // Tracer de droite et traitement pour espace de Hough
-    std::vector<float> equationDroite(float x1, float y1, float x2, float y2);
-    //void tracerDroite(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input);
-    std::vector<float> equationDroitePolaire(float x, float y, float rho, float theta);
-    void tracerDroite(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input);
-    void tracerSegment(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input);
-    std::vector<std::tuple<double, double>> getNotWhite(std::vector<std::vector<Pixel>>& input);
-    std::vector<std::tuple<double, double>> getLignes(std::vector<std::vector<Pixel>>& input, int nb_intersections, double threshold);
-    std::pair<int, int> getMaximum(const std::vector<std::vector<Pixel>>& input); // Avoir les coordonnées du maximum de la matrice de pixel
+    // Récupération, traçage de droite
+    void tracerDroite(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input); // Trace une droite sur l'image
+    std::vector<std::tuple<double, double>> getNotWhite(std::vector<std::vector<Pixel>>& input); // Recupère les pixels non blancs
+    std::vector<std::tuple<double, double>> getLignesNaif(std::vector<std::vector<Pixel>>& input, int nb_intersections, double threshold); // Méthode naive
+    std::vector<std::tuple<double, double>> getLignesNonNaif(std::vector<std::vector<Pixel>>& input, int nb_intersections, double threshold); // Méthode non naive
 
 };
-
-
 
 #endif

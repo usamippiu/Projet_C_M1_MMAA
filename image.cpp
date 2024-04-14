@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include "image.h"
 #include "pixel.h"
 
@@ -5,9 +7,8 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
-#include<cmath>
-#include<tuple>
-#include<utility>
+#include <cmath>
+#include <tuple>
 
 // Charger une image
 void PPMImage::PPMImageLoader(const std::string& filename) {
@@ -69,9 +70,9 @@ int PPMImage::getMaxColor() const{
 
 // Afficher la matrice de Pixel
 void PPMImage::afficheMatrice(std::vector<std::vector<Pixel>>&  input) {
-    for(unsigned int i = 0; i <input.size(); i++ )
+    for(unsigned int i = 0; i < this->height; i++ )
     {
-        for(unsigned int j = 0; j < input[0].size() ; j++)
+        for(unsigned int j = 0; j < this->width ; j++)
         {
             std::cout << "r " << input[i][j].getPixel()[0] << " g " << input[i][j].getPixel()[1] << " b " << input[i][j].getPixel()[2] << std::endl;
         }
@@ -91,7 +92,7 @@ std::vector<std::vector<Pixel>> PPMImage::convertTo2D() {
     return output;
 }
 
-//Conversion matrice en image
+// Conversion matrice en image
 void PPMImage::MatriceToImage(std::vector<std::vector<Pixel>>& input, std::string filename){
     std::ofstream fichier;
     fichier.open(filename);
@@ -115,80 +116,27 @@ void PPMImage::MatriceToImage(std::vector<std::vector<Pixel>>& input, std::strin
     fichier.close();
 }
 
-// Maillage de l'image
-// discrétiser l'espace de paramètres, à le découper en petits rectangles, et à dénombrer pour chaque rectangle le nombre de courbe y passant.
-// On construit ainsi une matrice dite d'accumulation, les maxima locaux de cette matrice correspondant à des droites probables.
-
-std::vector<float> PPMImage::equationDroite( float x1, float y1, float x2, float y2 ){
-    float a = (y2 - y1) / (x2 - x1);
-    float b = y1 - a * x1;
-    return {a, b};
-}
-
-//void PPMImage::tracerDroite(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
-//{
-//    // si la droite n'est pas verticale
-//
-//    if ( std::abs(eqDroite[0]) < 1 ){
-//        for(unsigned int i = 0; i < height ; ++i)
-//        {
-//            float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
-//            unsigned int y_entier = (unsigned int) std::round(y);
-//            if ( y_entier <= height)
-//            {
-//                input[i][y_entier].setRGB(0, 0, 0);
-//            }
-//        }
-//    }
-//
-//    // sinon
-//
-//    else {
-//        for(unsigned int i = 0; i < width ; ++i)
-//        {
-//            float x = (i - eqDroite[1])/eqDroite[0]; //equation de droite pour le nouveau point
-//            unsigned int x_entier = (unsigned int) std::round(x);
-//            if (x_entier <= width)
-//            {
-//                input[x_entier][i].setRGB(0, 0, 0);
-//            }
-//        }
-//    }
-//
-//}
-
-// y = - costh/sinth * x + rho/ sinth
-// theta = angle entre la droite et l'axe des abscisses
-// rho = x costh + y sinth
-std::vector<float> PPMImage::equationDroitePolaire( float x, float y, float rho, float theta )
-{
-    // faire attention si theta = 0
-    // bien diviser par k si on a fait k * pho dans la fonction drawSinusoïd
-    float cosTheta = std::cos(theta);
-    float sinTheta =  std::sin(theta);
-    // a et b de l'équation de la droite
-    float a = -cosTheta / sinTheta;
-    float b = rho / 3*sinTheta;
-
-    return {a, b};
-}
-
-// Droite polaire
-void PPMImage::tracerDroite( std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input )
+// On trace une droite sur l'image avec une equation de droite et on implemente un algo d'antialiasing
+void PPMImage::tracerDroite(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input)
 {
     for (unsigned int i = 0; i < height; i++)
     {
-        float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
-        unsigned int y_entier = (unsigned int) std::round(y);
-
-        if ( y_entier < width )
-        {
-            input[i][y_entier].setRGB( 0, 0, 0 );
+        float y = eqDroite[0] * i + eqDroite[1];
+        if(y >=0){
+            // Antialiasing
+            for (unsigned y_rounded = std::floor(y); y_rounded <= std::ceil(y); ++y_rounded) {
+                double percent_y = 1 - std::abs(y - y_rounded);
+                if (y_rounded < width)
+                {
+                    int col = std::round(255*(1-percent_y));
+                    input[i][y_rounded].setRGB(col, col, col);
+                }
+            }
         }
     }
 }
 
-// Traitement pour droites dans l'espace de Hough
+// Recuperation des pixels non blancs
 std::vector<std::tuple<double, double>> PPMImage::getNotWhite( std::vector<std::vector<Pixel>>& input )
 {
     std::vector<std::tuple<double, double>> notWhite;
@@ -204,15 +152,17 @@ std::vector<std::tuple<double, double>> PPMImage::getNotWhite( std::vector<std::
      return notWhite;
 }
 
+// Recupere la distance euclidienne entre deux tuples
 double tuple_norm(const std::tuple<double, double>& a, const std::tuple<double, double>& b) {
     double dx = std::get<0>(b) - std::get<0>(a);
     double dy = std::get<1>(b) - std::get<1>(a);
     return std::sqrt(dx * dx + dy * dy);
 }
 
+// Fait la moyenne d'un vecteur de tuples
 std::tuple<double, double> average_tuple(const std::vector<std::tuple<double, double>>& tuples) {
-    double sum_x = 0.0;
-    double sum_y = 0.0;
+    double sum_x = 0;
+    double sum_y = 0;
     for (const auto& tuple : tuples) {
         sum_x += std::get<0>(tuple);
         sum_y += std::get<1>(tuple);
@@ -220,7 +170,9 @@ std::tuple<double, double> average_tuple(const std::vector<std::tuple<double, do
     return std::make_tuple(sum_x / tuples.size(), sum_y / tuples.size());
 }
 
+// Fonction qui supprime des droites trop proche en fonction d'un threshold
 void remove_close_tuples(std::vector<std::tuple<double, double>>& vec, double threshold) {
+    // On parcours le vecteur de tuple et on les regroupes en fonction de si elles sont trop proches
     std::vector<std::vector<std::tuple<double, double>>> close_tuples_groups;
     for (const auto& tuple : vec) {
         bool grouped = false;
@@ -237,18 +189,20 @@ void remove_close_tuples(std::vector<std::tuple<double, double>>& vec, double th
     }
 
     vec.clear();
+    // On recupère la moyenne des tuples groupés
     for (const auto& group : close_tuples_groups) {
         vec.push_back(average_tuple(group));
     }
 }
 
+// Fonction qui divise un tuple par une constante pour scale les points
 std::vector<std::tuple<double, double>> diviserTuple(const std::vector<std::tuple<double, double>>& vecteur, double quotient) {
 
     std::vector<std::tuple<double, double>> resultat;
 
     for (const auto& element : vecteur) {
-        double premier = std::get<0>(element) / quotient;
-        double deuxieme = std::get<1>(element) / quotient;
+        double premier = std::get<0>(element)/quotient;
+        double deuxieme = std::get<1>(element)/quotient;
 
         resultat.push_back(std::make_tuple(premier, deuxieme));
     }
@@ -256,13 +210,14 @@ std::vector<std::tuple<double, double>> diviserTuple(const std::vector<std::tupl
     return resultat;
 }
 
+// Fonction qui multiplie l'ordonnée a l'origine d'une equation de droite stocké dans un vecteur par une constante (pour le rescale)
 std::vector<std::tuple<double, double>> multiplierTuple(const std::vector<std::tuple<double, double>>& vecteur, double quotient) {
 
     std::vector<std::tuple<double, double>> resultat;
 
     for (const auto& element : vecteur) {
         double premier = std::get<0>(element);
-        double deuxieme = std::get<1>(element) * quotient;
+        double deuxieme = std::get<1>(element)*quotient;
 
         resultat.push_back(std::make_tuple(premier, deuxieme));
     }
@@ -270,36 +225,47 @@ std::vector<std::tuple<double, double>> multiplierTuple(const std::vector<std::t
     return resultat;
 }
 
-std::vector<std::tuple<double, double>> PPMImage::getLignes(std::vector<std::vector<Pixel>>& matrice_Pixel, int nb_intersections, double threshold){
+// Algorithme naif
+std::vector<std::tuple<double, double>> PPMImage::getLignesNaif(std::vector<std::vector<Pixel>>& matrice_Pixel, int nb_intersections, double threshold){
+    // Récuperation pixels non blancs
     std::vector<std::tuple<double, double>> notWhite;
     notWhite = this->getNotWhite(matrice_Pixel);
 
-    std::vector<std::tuple<double, double>> scaledTuples = diviserTuple(notWhite, 30.);
+    // Scaling
+    std::vector<std::tuple<double, double>> scaledTuples = diviserTuple(notWhite, height);
+
     std::vector<std::tuple<double, double>> droites;
 
+    // Delimitation espace de Hough
     float x_min = -2;
     float x_max = 2;
     float y_min = -2;
     float y_max = 2;
 
+    // Precision de l'espace de Hough
     float precision = .001;
 
+    // Dimension espace de Hough
     int n_cols = std::round(std::abs(x_min-x_max)/precision);
     int n_rows = std::round(std::abs(y_min-y_max)/precision);
 
+    // Espace de Hough
     std::vector<std::vector<int>> hough(n_rows, std::vector<int>(n_cols, 0));
 
+    // Construction des droites
     for (const std::tuple<double, double>& tuple : scaledTuples) {
         double x = std::get<0>(tuple);
         double y = std::get<1>(tuple);
         for(double m = 0; m < n_cols ; ++m){
             double b = y - (m*std::abs(x_min-x_max)/n_cols+x_min)*x;
             double b_round = std::round(b/precision) - y_min/precision;
-            if (b_round < n_rows){
+            if (b_round < n_rows && b_round > 0){
                 hough[b_round][m] +=1;
             }
         }
     }
+
+    // Selection des indices de l'espace de Hough qui on été le plus été intersecté par des droites
     for (int i = 0; i < n_rows ; ++i){
         for(int j = 0; j < n_cols ; ++j){
             if (hough[i][j] >= nb_intersections)
@@ -307,47 +273,71 @@ std::vector<std::tuple<double, double>> PPMImage::getLignes(std::vector<std::vec
         }
     }
 
+    // Suppression des droites trop proches
     remove_close_tuples(droites, threshold);
 
-    std::vector<std::tuple<double, double>> rescaledDroites = multiplierTuple(droites, 30.);
+    // Rescaling
+    std::vector<std::tuple<double, double>> rescaledDroites = multiplierTuple(droites, height);
 
     return rescaledDroites;
 }
 
-void PPMImage::tracerSegment(std::vector<float> eqDroite, std::vector<std::vector<Pixel>>& input){
+// Algorithme non naif
+std::vector<std::tuple<double, double>> PPMImage::getLignesNonNaif(std::vector<std::vector<Pixel>>& matrice_Pixel, int nb_intersections, double threshold){
+    // Récuperation pixels non blancs
+    std::vector<std::tuple<double, double>> notWhite;
+    notWhite = this->getNotWhite(matrice_Pixel);
 
-    for(unsigned int i = 0; i < height ; ++i)
-    {
-        float y = eqDroite[0] * i + eqDroite[1]; //equation de droite pour le nouveau point
-        unsigned int y_entier = (unsigned int) std::round(y);
-        if ( y_entier <= height)
-        {
-            if (input[i][y_entier].r != 255 && input[i][y_entier].g != 255 && input[i][y_entier].b != 255){
-                input[i][y_entier].setRGB(0, 0, 0);
+    // Scaling
+    std::vector<std::tuple<double, double>> scaledTuples = diviserTuple(notWhite, height);
+
+    std::vector<std::tuple<double, double>> droites;
+
+    // Delimitation espace de Hough
+    float x_min = 0;
+    float x_max = M_PI;
+    float y_min = -2;
+    float y_max = 2;
+
+    // Precision de l'espace de Hough
+    float precision = .001;
+
+    // Dimension espace de Hough
+    int n_cols = std::round(std::abs(x_min-x_max)/precision);
+    int n_rows = std::round(std::abs(y_min-y_max)/precision);
+
+    // Espace de Hough
+    std::vector<std::vector<int>> hough(n_rows, std::vector<int>(n_cols, 0));
+
+    // Construction des sinusoidales
+    for (const std::tuple<double, double>& tuple : scaledTuples) {
+        double x = std::get<0>(tuple);
+        double y = std::get<1>(tuple);
+        for(double theta = 0; theta < n_cols ; ++theta){
+            double rho = x*cos(theta*std::abs(x_min-x_max)/n_cols) + y*sin(theta*std::abs(x_min-x_max)/n_cols);
+            double rho_round = std::round(rho/precision - y_min/precision);
+            if (rho_round < n_rows && rho_round > 0){
+                hough[rho_round][theta] +=1;
             }
         }
-
     }
-}
 
-std::pair<int, int> PPMImage::getMaximum(const std::vector<std::vector<Pixel>>& input)
-{
-    Pixel maxPixel;
-    maxPixel.setRGB(0, 0, 0) ;
-    int maxI = 0;
-    int maxJ = 0;
-
-    for (int i = 0; i < input.size(); ++i) {
-        for (int j = 0; j < input[i].size(); ++j) {
-
-            if (input[i][j].r > maxPixel.r || input[i][j].g > maxPixel.g || input[i][j].b > maxPixel.b ) {
-                maxPixel.setRGB( input[i][j].r, input[i][j].g, input[i][j].b );
-                maxI = i;
-                maxJ = j;
-                std::cout << "max_test = " << maxPixel.r << std::endl;
+    // Selection des indices de l'espace de Hough qui on été le plus été intersecté par des sinusoidales
+    for (int i = 0; i < n_rows ; ++i){
+        for(int j = 0; j < n_cols ; ++j){
+            if (hough[i][j] >= nb_intersections){
+                if (sin(j*precision+x_min) > 0.01){
+                    droites.push_back(std::make_tuple(-cos(j*precision+x_min)/sin(j*precision+x_min), (i*precision+y_min)/sin(j*precision+x_min)));
+                }
             }
         }
     }
-    return {maxI, maxJ};
-}
 
+    // Suppression des droites trop proches
+    remove_close_tuples(droites, threshold);
+
+    // Rescaling
+    std::vector<std::tuple<double, double>> rescaledDroites = multiplierTuple(droites, height);
+
+    return rescaledDroites;
+}
